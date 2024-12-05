@@ -4,11 +4,9 @@ This renaming script will homogenize file names on a local machine.
 
 import os
 
-directory = r"/Users/rzieber/Documents/3D-PAWS/Turkiye/output/station_TSMS05/"
+directory = r"C://path//to//local//data//"
 old_format = r"TSMS03_2023_04_02.dat"
-# DON'T FORGET TO CHANGE THE DATE!!!!!!!!
-sensor_name = r"TSMS05_"
-# Don't forget to comment out os.rename to print results before making any changes!
+sensor_name = r"TSMS05_" # BEFORE RUNNING THIS SCRIPT -- comment out line 28 os.rename() to verify changes are accurate!!!!
 
 # ------------------------------------------------------------------
 
@@ -24,10 +22,10 @@ for filename in files:
     if ".dat" in filename and len(filename) == len(old_format): 
         print("To reformat:", filename)
 
-        date = filename[7:11] + filename[12:14] + filename[15:17]
+        date = filename[7:11] + filename[12:14] + filename[15:17] # ensure this splicing matches that in old_format
         new_filename = sensor_name + date + ".dat"
-        # Don't forget to comment out os.rename to print results before making any changes!
-        os.rename(directory+filename, directory+new_filename)
+        
+        # os.rename(directory+filename, directory+new_filename) # ===== COMMENT ME OUT BEFORE MAKING CHANGES
         
         i += 1
         print("Reformatted:", new_filename)
