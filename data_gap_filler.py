@@ -6,8 +6,9 @@ import sys
 
 """
 Helper function to fill_empty_rows() 
-The number of columns in each station's csv varies. This function dynamically builds a new row to fill in missing timestamps regardless
-of however many columns there might be. Missing rows should be built with empty cells (np.nan)
+Creates an array representing the row to be added for infilling a data gap. The array contains the missing timestamp, 
+and np.nan's for each of the dataframe's columns.
+
 columns -- the df's column attribute
 missing_timestamp -- the timestamp for the missing row
 """
@@ -27,8 +28,9 @@ def _build_empty_row(columns:Index, missing_timestamp:Timestamp) -> list:
     return next_row
 
 """
-Create a list to merge with the reformatted dataframe that fills in data gaps with missing timestamps. 
-Merges that list with the reformatted dataframe and returns it. 
+Creates a list to merge with the dataframe that fills in data gaps with missing timestamps. 
+Merges that list with the dataframe to be reformatted and returns it. 
+
 reformatted_df -- the df to reformat with data gaps filled
 time_delta -- the dataset's resolution (1-minute reporting period)
 set_index -- specify whether you want the dataframe returned by fc'n to have the index set (default False)
