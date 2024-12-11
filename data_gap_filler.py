@@ -1,6 +1,6 @@
 from pandas import Index, Timestamp
 import pandas as pd
-import np
+import numpy as np
 from datetime import timedelta
 import sys
 
