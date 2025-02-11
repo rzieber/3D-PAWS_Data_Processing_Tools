@@ -6,7 +6,7 @@ This script standardizes the TSV delimiter spacing so that it may be read into a
 lines = None
 standardized_lines = []
 
-with open('/Users/rzieber/Documents/3D-PAWS/Turkiye/reformatted/TSMS/complete_record/Konya_17245.dat',\
+with open("/path/to/data/folder/" + "filename.dat",\
                 'r', encoding='utf-8', errors='replace') as file:
     lines = file.readlines()
 
@@ -20,19 +20,21 @@ for line in lines:
     
     standardized_lines.append(standardized_line[-1])
 
-with open('/Users/rzieber/Documents/3D-PAWS/Turkiye/reformatted/TSMS/complete_record/Konya_17245_STANDARDIZED.dat', \
+with open('path/to/data/folder' + "filename.csv", \
                 'w', encoding='utf-8', errors='replace') as file:
     file.writelines(standardized_lines)
 
 
+# --------------------------------------------------------------------------------------------------------------------
 
 import csv
+
 """
 This is how to take a csv with standard tab separation and turn it into Joey's TSV format.
 """
 # reformat tsv 
-with open("FILE PATH", 'r', newline='') as infile, \
-        open("FILE PATH", 'w', newline='') as outfile:
+with open("/path/to/folder"+"filename.csv", 'r', newline='') as infile, \
+        open("/path/to/folder"+"filename.dat", 'w', newline='') as outfile:
     reader = csv.reader(infile)
     writer = csv.writer(outfile, delimiter='\t')
     header_row = "year  mon  day  hour  min  temp  humidity  actual_pressure avg_wind_dir  avg_wind_speed\n"
