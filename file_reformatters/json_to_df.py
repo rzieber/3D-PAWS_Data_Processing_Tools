@@ -55,8 +55,7 @@ def df_builder(headers:list, measurements:list, column_order:list=[], filepath:s
 
 
 with open("/path/to/json.file", 'r', encoding='utf-8', errors='coerce') as file:
-    # Data structures to hold JSON data stream
-    measurements = []  # list of dictionaries  (e.g. {'t1': 25.3, 'uv1': 2, 'rh1': 92.7, 'sp1': 1007.43, 't2': 26.9, 'vis1': 260})
+    measurements = [] 
     headers = set()
 
     for l, line in enumerate(file, start=1):
