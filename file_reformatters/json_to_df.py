@@ -26,7 +26,7 @@ def df_builder(headers:list, measurements:list, column_order:list=[], filepath:s
     if not measurements:
         raise ValueError("[ERROR]: No valid measurements found in JSON file.")
 
-    data = [] # list of timestamps, measurements, test val's, and headers (to turn into dataframe)
+    data = [] 
     
     for i in range(len(measurements)):
         measurement_dict = {header: measurements[i].get(header, fill_empty) for header in headers} 
@@ -61,10 +61,8 @@ with open("/path/to/json.file", 'r', encoding='utf-8', errors='coerce') as file:
 
     for l, line in enumerate(file, start=1):
         try:
-            dictionary_data = json.loads(line) # a dictionary containing all the variables in each line in file
-            
+            dictionary_data = json.loads(line)
             measurements.append(dictionary_data)
-
             headers.update(dictionary_data.keys())
 
         except json.JSONDecodeError as e:
