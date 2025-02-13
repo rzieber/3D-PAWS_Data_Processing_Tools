@@ -7,6 +7,7 @@ Any scripts not listed here are not ready for use.
 # Dependancies 
 * csv - for reformatting from csv to tsv
 * os - for filepath management
+* json - for reformatting from json to dataframe
 * pandas
 
 ```python
