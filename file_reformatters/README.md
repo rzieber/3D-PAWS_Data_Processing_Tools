@@ -6,10 +6,12 @@ Any scripts not listed here are not ready for use.
 
 # Dependancies 
 * csv - for reformatting from csv to tsv
-* os - for filepath management
+* os - for file management
 * json - for reformatting from json to dataframe
+* pathlib - for file management
+* logging - for console updates
 * pandas
 
 ```python
-pip install pandas csv json
+pip install pandas csv json 
 ```
