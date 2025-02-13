@@ -10,5 +10,5 @@ Any scripts not listed here are not ready for use.
 * pandas
 
 ```python
-pip install pandas csv
+pip install pandas csv json
 ```
