@@ -68,11 +68,23 @@ def standardize_tsv(input_file:Path, output_file:Path) -> None:
 
 
 """
+ARGUMENTS
+    input_file - the full file path to the TSV in column-aligned format                 <Path>
+    output_file - the full file path where the standardized TSV file will be written    <Path>
+    header_row - string with all the column names
+RAISES
+    TypeError - if 'input_file' or 'output_file' is not a Path object
+    FileNotFoundError - if 'input_file' does not exist
+    IsADirectoryError - if 'input_file' is a directory
+    NotADirectoryError - if the directory of 'output_file' does not exist
+    PermissionError - if there are insufficient permissions to read 'input_file',
+                        or to write to 'output_file'
+--------------------------------------------------------------------------------------------------
 Accepts a standard csv file and converts it into a column-aligned TSV (aka Joey's format).
 Requires a formatted header row, and a 'row_formatting' string that contains proper spacing,
-as well as the name of the timestamp column (if necessary). Joey's format breaks the timestamp column apart
-by year, month, day, hour, and minute. This script will do the same if the timestamp column isn't already 
-formatted in the year mon day hour min format.
+as well as the name of the timestamp column if not already formatted. 
+Joey's format breaks the timestamp column apart by year, month, day, hour, and minute. 
+This script will do the same if the timestamp column isn't already in the year mon day hour min format.
 """
 def align_columns(input_file:Path, output_file:Path, header_row:str, row_formatting:str, timestamp_col:str='') -> None:
     # Input validation

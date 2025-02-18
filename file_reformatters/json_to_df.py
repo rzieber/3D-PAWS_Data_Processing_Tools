@@ -1,6 +1,7 @@
 import json
 import logging
 import pandas as pd
+from pathlib import Path
 
 """
 ARGUMENTS
@@ -69,8 +70,10 @@ def df_builder(headers:list, measurements:list, column_order:list=[], filepath:s
 def main():
     logging.basicConfig(level=logging.INFO)
 
+    json_file = Path("/path/to/json.file")
+
     # Read JSON data from file and process it
-    with open("/path/to/json.file", 'r', encoding='utf-8', errors='replace') as file:
+    with open(json_file, 'r', encoding='utf-8', errors='replace') as file:
         measurements = [] 
 
         for l, line in enumerate(file, start=1):
@@ -81,8 +84,6 @@ def main():
             except json.JSONDecodeError as e:
                 logging.error(f"[ERROR]: JSONDecodeError on line {l}\n{e}")
                 continue
-            
-            l += 1
         
         headers = list({key for d in measurements for key in d.keys()})
 
