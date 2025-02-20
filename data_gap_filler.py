@@ -84,13 +84,12 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:timedelta, set_index
 
 
 
-"""
-======================================
-Function Call
-======================================
-"""
-df = pd.DataFrame()
+def main():
+    df = pd.DataFrame()
 
-gaps_filled_df = fill_empty_rows(df, timedelta(minutes=1))
+    gaps_filled_df = fill_empty_rows(df, timedelta(minutes=1))
 
-print(type(gaps_filled_df))
+
+
+if __name__ == '__main__':
+    main()
