@@ -2,6 +2,8 @@ from pandas import Index, Timestamp
 import pandas as pd
 import numpy as np
 from datetime import timedelta
+from pathlib import Path
+import os
 
 """
 Helper function to fill_empty_rows()
@@ -86,9 +88,22 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=
 
 
 def main():
-    df = pd.DataFrame()
+    data_directory = Path("/path/to/data/folder/")
+    
+    files = []
 
-    gaps_filled_df = fill_empty_rows(df, timedelta(minutes=1))
+    for file in os.listdir(data_directory):
+        if os.path.isfile(os.path.join(data_directory, file)): files.append(file)
+
+    for file in files:
+        df = pd.read_csv(file)
+
+        gaps_filled_df = fill_empty_rows(df, timedelta(minutes=15))
+
+        file_name = file.with_name(str(file.name)[:len(str(file.name))-4]+"_GAPS_FILLED.csv")
+        file.rename(file_name)
+
+        gaps_filled_df.to_csv(file)
 
 
 
