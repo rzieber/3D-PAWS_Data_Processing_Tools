@@ -25,7 +25,7 @@ def _build_empty_row(columns:Index, missing_timestamp:Timestamp, fill_empty=np.n
     next_row = []
 
     for col in columns:
-        if col == 'date': next_row.append(missing_timestamp)
+        if col == 'time': next_row.append(missing_timestamp)
         else: next_row.append(fill_empty)
 
     return next_row
@@ -34,7 +34,7 @@ def _build_empty_row(columns:Index, missing_timestamp:Timestamp, fill_empty=np.n
 """
 Create a list to merge with the reformatted dataframe that fills in data gaps with missing timestamps. 
 Merges that list with the reformatted dataframe, sorts by time, and returns it. 
-REQUIREMENT: the timestamp column must be named 'date' ---------------------------------------------------
+REQUIREMENT: the timestamp column must be named 'time' ---------------------------------------------------
 
 reformatted_df -- the df to reformat with data gaps filled
 time_delta -- the dataset's resolution (1-minute reporting period)
@@ -51,16 +51,16 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:timedelta, set_index
     nan_columns = reformatted_df.columns[reformatted_df.isna().all()]
     if not nan_columns.empty: print("[WARNING]: fill_empty_rows() -- Columns with all NaN values:", nan_columns.tolist())
 
-    if 'date' not in reformatted_df.columns: reformatted_df.reset_index(inplace=True)
+    if 'time' not in reformatted_df.columns: reformatted_df.reset_index(inplace=True)
 
     blank_rows = [] # a list of lists 
 
-    to_filter = reformatted_df[reformatted_df['date'].isna()]
-    reformatted_df = reformatted_df[~reformatted_df['date'].isna()]
+    to_filter = reformatted_df[reformatted_df['time'].isna()]
+    reformatted_df = reformatted_df[~reformatted_df['time'].isna()]
 
     for i in range(len(reformatted_df)-1):
-        current_timestamp = reformatted_df['date'].iloc[i].replace(second=0, microsecond=0)
-        next_timestamp = reformatted_df['date'].iloc[i+1].replace(second=0, microsecond=0)
+        current_timestamp = reformatted_df['time'].iloc[i].replace(second=0, microsecond=0)
+        next_timestamp = reformatted_df['time'].iloc[i+1].replace(second=0, microsecond=0)
 
         while next_timestamp - current_timestamp > time_delta:
             current_timestamp += time_delta
@@ -71,15 +71,15 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:timedelta, set_index
     if not blank_rows: return reformatted_df      
     else:
         blank_rows_df = pd.DataFrame(blank_rows, columns=reformatted_df.columns)
-        reformatted_df = pd.concat([reformatted_df, blank_rows_df]).sort_values('date').reset_index(drop=True)
+        reformatted_df = pd.concat([reformatted_df, blank_rows_df]).sort_values('time').reset_index(drop=True)
 
-        reformatted_df.sort_values(by='date', inplace=True)
+        reformatted_df.sort_values(by='time', inplace=True)
 
-        pd.concat([to_filter, reformatted_df['date'].isna()])
-        reformatted_df = reformatted_df[~reformatted_df['date'].isna()]
-        if not to_filter.empty: print("[WARNING]: fill_empty_rows() -- Number of rows identified with invalid (NaT) timestamps:", len(to_filter['date'].tolist()))
+        pd.concat([to_filter, reformatted_df['time'].isna()])
+        reformatted_df = reformatted_df[~reformatted_df['time'].isna()]
+        if not to_filter.empty: print("[WARNING]: fill_empty_rows() -- Number of rows identified with invalid (NaT) timestamps:", len(to_filter['time'].tolist()))
 
-        if set_index: reformatted_df.set_index('date', inplace=True)
+        if set_index: reformatted_df.set_index('time', inplace=True)
 
         return reformatted_df
 

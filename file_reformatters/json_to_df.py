@@ -1,13 +1,19 @@
 import json
+import logging
 import pandas as pd
+from pathlib import Path
 
 """
-headers - column names to be used in CSV                                        <list>
-measurements - data points at each timestamp                                    <list>
-column_order - [OPTIONAL] specify an order for columns in df/csv                <list>
-filepath - [OPTIONAL] export path for csv of df, default is the empty string    <str>
-null_value - [OPTIONAL] char to fill empty cells, default is the empty string   <str>
-
+ARGUMENTS
+    headers - column names to be used in CSV                                        <list>
+    measurements - data points at each timestamp                                    <list>
+    column_order - [OPTIONAL] specify an order for columns in df/csv                <list>
+    filepath - [OPTIONAL] export path for csv of df, default is the empty string    <str>
+    null_value - [OPTIONAL] char to fill empty cells, default is the empty string   <str>
+RAISES
+    TypeError - if parameters do not match the type specified by the argument
+    ValueError - if the 'measurements' argument contains no data
+----------------------------------------------------------------------------------------------    
 Constructs a dataframe using a list of header names and measurements from JSON file. 
 Options:
     - Specify a column order for the dataframe. Timestamp column will always be first.
@@ -18,15 +24,18 @@ Returns the dataframe. Optional feature to generate a CSV of the df at the speci
 def df_builder(headers:list, measurements:list, column_order:list=[], filepath:str='', fill_empty='') -> pd.DataFrame: 
     # Input validation
     if not isinstance(headers, list):
-        raise TypeError(f"The 'headers' parameter in csv_builder() should be of type <list>, passed: {type(headers)}")
+        raise TypeError(f"[ERROR]: The 'headers' parameter in csv_builder() should be of type <list>, passed: {type(headers)}")
     if not isinstance(measurements, list):
-        raise TypeError(f"The 'measurements' parameter in csv_builder() should be of type <list>, passed: {type(measurements)}")
+        raise TypeError(f"[ERROR]: The 'measurements' parameter in csv_builder() should be of type <list>, passed: {type(measurements)}")
     if not isinstance(column_order, list):
-        raise TypeError(f"The 'column_order' parameter in csv_builder() should be of type <list>, passed: {type(column_order)}")
+        raise TypeError(f"[ERROR]: The 'column_order' parameter in csv_builder() should be of type <list>, passed: {type(column_order)}")
     if not isinstance(filepath, str):
-        raise TypeError(f"The 'filepath' parameter in csv_builder() should be of type <str>, passed: {type(filepath)}")
+        raise TypeError(f"[ERROR]: The 'filepath' parameter in csv_builder() should be of type <str>, passed: {type(filepath)}")
     if not measurements:
         raise ValueError("[ERROR]: No valid measurements found in JSON file.")
+    
+    logging.basicConfig(level=logging.INFO)
+    logging.info("Starting conversion from JSON to pandas DataFrame.")
 
     # Process measurements into a list of dictionaries
     data = [] 
@@ -53,12 +62,18 @@ def df_builder(headers:list, measurements:list, column_order:list=[], filepath:s
 
     if filepath: df.to_csv(filepath, index=False)
 
+    logging.info("Dataframe successfully created.")
+
     return df
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
+
+    json_file = Path("/path/to/json.file")
+
     # Read JSON data from file and process it
-    with open("/path/to/json.file", 'r', encoding='utf-8', errors='coerce') as file:
+    with open(json_file, 'r', encoding='utf-8', errors='replace') as file:
         measurements = [] 
 
         for l, line in enumerate(file, start=1):
@@ -67,12 +82,8 @@ def main():
                 measurements.append(dictionary_data)
 
             except json.JSONDecodeError as e:
-                print("============================================================")
-                print(f"[ERROR]: JSONDecodeError on line {l}: {e}")
-                print("============================================================\n")
+                logging.error(f"[ERROR]: JSONDecodeError on line {l}\n{e}")
                 continue
-            
-            l += 1
         
         headers = list({key for d in measurements for key in d.keys()})
 
