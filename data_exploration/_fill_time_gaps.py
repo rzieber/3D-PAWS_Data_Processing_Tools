@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 
+
 """
 Helper function to fill_empty_rows()
 Builds a row to be merged with the dataframe for a missing timestamp.
