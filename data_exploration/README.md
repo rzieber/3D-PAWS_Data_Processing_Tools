@@ -6,12 +6,12 @@ Assumptions:<br>
     - Timestamp column must be named ```time```<br>
     - Data is reported every minute
 
-# Usage
-```bash
-python3 main.py path/to/raw/data/folder path/to/output/folder
-```
-
 # Dependancies 
 ```bash
 pip install -r requirements.txt
+```
+
+# Usage
+```bash
+python3 main.py path/to/raw/data/folder path/to/output/folder
 ```
