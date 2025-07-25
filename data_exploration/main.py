@@ -8,22 +8,11 @@ sys.path.insert(0, str(project_root))
 
 from data_exploration._fill_time_gaps import fill_empty_rows
 
-def main():
+def main(data=None, report=None, plots=None):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=pd.errors.SettingWithCopyWarning)
 
-        # Setup -------------------------------------------------------------------------------------------------------------
-
-        #data = Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/data")   
-        data = Path(sys.argv[1])
-        # plots = Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/plots")
-        #report = Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/reports")
-        report = Path(sys.argv[2])
-
-        # --------------------------------------------------------------------------------------------------------------------
-
-        # get the folder names in data, store in list, convert to dataframes, store those in list
-        csv_files = list(data.glob("*.csv"))  # get all CSV files
+        csv_files = list(data.glob("*.csv")) 
         dataframes = []
 
         for csv in csv_files:
@@ -60,12 +49,40 @@ def main():
                 ignore_index=True
             )
 
-            # create report of all modified data and produce cleaned csv
+            # create report of all modified data, produce cleaned csv, and statistical summary
             file_name = csv_files[i].name
             outliers.to_csv(report / f"{file_name[:len(file_name)-4]}_outliers.csv", index=False)
             gaps_filled.to_csv(report / f"{file_name[:len(file_name)-4]}_cleaned.csv", index=False)
-            print(f"\tProcess completed.")
+            gaps_filled.drop(columns=['time']).describe(include='all').round(2).to_csv(report / f"{file_name[:len(file_name)-4]}_stats.csv")
+            
+            # vars = [
+            #     'bt1', 'ht1', 'st1', 'mt1', # temperature
+            #     'hh1', 'sh1',               # humidity
+            #     'bp1',                      # pressure
+            #     'ws', 'wd',                 # wind
+            #     'rg'                        # precip
+            # ]
+            
+            # rows = ['Variable', 'Mean', 'Mean Absolute Error', 'Root Mean ']
+            # for v in vars:
+            #     row = [v]
 
+        
+        print(f"Process completed.")
+
+        # if sys.argv[3]:
+        #     print("Starting preliminary plot gen.")
+
+
+
+        #     print("Plot gen completed.")
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 2:
+        main(
+            Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/data"), 
+            Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/reports")
+        )
+    else:
+        main(Path(sys.argv[1]), Path(sys.argv[2]))
+    
