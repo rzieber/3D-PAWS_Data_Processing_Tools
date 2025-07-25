@@ -3,7 +3,7 @@ The data exploration folder contains scripts which process CSV data for explorat
 These scripts have been designed to work out of the box with any 3D-PAWS csv's downloaded via the CHORDS API.
 
 Assumptions:
-    - Timestamp column must be named ```time```
+    - Timestamp column must be named ```time```<br>
     - Data is reported every minute
 
 # Usage
