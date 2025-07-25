@@ -5,19 +5,12 @@ There exists the option to create some basic plots using the cleaned dataset. By
 will enable this functionality.<br>
 <br>
 Running `main.py` will produce the following results:
-
-<<<<<<< HEAD
 - Raw data is cleaned:
   - Duplicate timestamps eliminated
   - Out-of-order timestamps sorted (ascending)
   - Time gaps filled in with empty rows
 - A report containing all data points removed during the cleaning process is generated 
 - A CSV is generated of the cleaned/reformatted data set
-=======
-Assumptions:
-    - Timestamp column must be named ```time```<br>
-    - Data is reported every minute
->>>>>>> e3fea8c (Update README.md)
 
 **Assumptions:**
 
