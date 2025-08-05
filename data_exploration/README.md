@@ -16,7 +16,6 @@ Running `main.py` will produce the following results:
 
 - Timestamp column must be named `time`
 - Data is reported every minute
-- Variables are using the standard shortnames: `bt1`, `ht1`, `st1`, `mt1`, `hh1`, `sh1`, `bp1`, `wg`, `wd`, `rg`
 - Source and destination folders follow this convention:
   - ```data``` folder contains raw data to be qc'd
   - ```report``` folder will contain the output from the qc script
