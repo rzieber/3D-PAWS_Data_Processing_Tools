@@ -11,7 +11,7 @@ Running `main.py` will produce the following results:
   - Out-of-order timestamps sorted (ascending)
   - Time gaps filled in with empty rows
 - A report containing all data points removed during the cleaning process is generated 
-- A CSV is generated of the cleaned/reformatted data set
+- A CSV is generated of the cleaned data set
 
 **Assumptions:**
 
