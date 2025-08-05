@@ -19,7 +19,7 @@ Running `main.py` will produce the following results:
 - Variables are using the standard shortnames: `bt1`, `ht1`, `st1`, `mt1`, `hh1`, `sh1`, `bp1`, `wg`, `wd`, `rg`
 - Source and destination folders follow this convention:
   - ```data``` folder contains raw data to be qc'd
-  - ```reports``` folder will contain the output from the qc script
+  - ```report``` folder will contain the output from the qc script
   - ```plots``` folder will contain the plots (if using) 
 
 # Dependancies 
