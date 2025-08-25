@@ -39,11 +39,11 @@ reformatted_df -- the df to reformat with data gaps filled
 time_delta -- the dataset's resolution (1-minute reporting period)
 set_index -- specify whether you want the dataframe returned by fc'n to have the index set (default False)
 """
-def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=False):
+def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:timedelta, set_index:bool=False):
     if not isinstance(reformatted_df, pd.DataFrame):
         raise ValueError(f"The fill_empty_row() function expects the 'reformatted_df' parameter to be of type <pd.DataFrame>, received: {type(reformatted_df)}")
-    if not isinstance(time_delta, int):
-        raise ValueError(f"The fill_empty_row() function expects the 'time_delta' parameter to be of type <int>, received: {type(time_delta)}")
+    if not isinstance(time_delta, timedelta):
+        raise ValueError(f"The fill_empty_row() function expects the 'time_delta' parameter to be of type <timedelta>, received: {type(time_delta)}")
     if not isinstance(set_index, bool):
         raise ValueError(f"The fill_empty_row() function expects the 'set_index' parameter to be of type <bool>, received: {type(set_index)}")
 
@@ -53,7 +53,7 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=
     if 'time' not in reformatted_df.columns: reformatted_df.reset_index(inplace=True)
 
     blank_rows = [] # a list of lists 
-    td = timedelta(minutes=time_delta)
+    #time_delta = timedelta(minutes=time_delta)
 
     to_filter = reformatted_df[reformatted_df['time'].isna()]
     reformatted_df = reformatted_df[~reformatted_df['time'].isna()]
@@ -62,8 +62,8 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=
         current_timestamp = reformatted_df['time'].iloc[i].replace(second=0, microsecond=0)
         next_timestamp = reformatted_df['time'].iloc[i+1].replace(second=0, microsecond=0)
 
-        while next_timestamp - current_timestamp > td:
-            current_timestamp += td
+        while next_timestamp - current_timestamp > time_delta:
+            current_timestamp += time_delta
             new_row = _build_empty_row(reformatted_df.columns, current_timestamp)
             if new_row is not None:
                 blank_rows.append(new_row)

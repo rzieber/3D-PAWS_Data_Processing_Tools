@@ -3,6 +3,7 @@ import sys
 import warnings
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import timedelta
 from pathlib import Path
 
 project_root = Path(__file__).resolve().parent.parent
@@ -10,24 +11,28 @@ sys.path.insert(0, str(project_root))
 
 from data_exploration._fill_time_gaps import fill_empty_rows
 
-def main(data=None, report=None, plots=None):
+def main(data=None, report=None, time_delta=timedelta(minutes=1), plots=None,):
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=pd.errors.SettingWithCopyWarning)
-        warnings.simplefilter("ignore", category=UserWarning)
+        # warnings.simplefilter("ignore", category=pd.errors.SettingWithCopyWarning)
+        # warnings.simplefilter("ignore", category=UserWarning)
 
         csv_files = list(data.glob("*.csv")) 
-        dataframes = []
 
         for csv in csv_files:
-            dataframes.append(  
-                pd.read_csv(csv, low_memory=False, parse_dates=['time'])
-            )
+            df = pd.read_csv(csv, low_memory=False, parse_dates=['time'])
+            df['time'] = df['time'].dt.floor('min')
 
-        print("Starting 3D-PAWS data formatting ------------------------------------------")
+            print("Starting 3D-PAWS data formatting ------------------------------------------")
 
-        for i, df in enumerate(dataframes):
-            file_name = csv_files[i].name[:len(csv_files[i].name)-4]
+            file_name = csv.name[:len(csv.name)-4]
             print(f"\tProcessing dataframe for {file_name}.")
+
+            # # TEMP FOR BARBADOS DATA
+            # # merge matching timestamps into the same row
+            # merged_df = (
+            #     df.groupby('time', as_index=False)
+            #     .agg(lambda x: x.dropna().iloc[0] if x.dropna().any() else None)
+            # )
 
             # eliminate duplicate timestamps + log duplicates
             duplicates_mask = df.duplicated(                                    
@@ -47,8 +52,9 @@ def main(data=None, report=None, plots=None):
             print("\t\tNumber of out-of-order timestamps:", len(out_of_order))
 
             # fill in time gaps
-            gaps_filled = fill_empty_rows(cleaned, 1)    
+            gaps_filled = fill_empty_rows(cleaned, time_delta)    
             print("\t\tData gaps (in minutes):", len(gaps_filled) - len(cleaned))
+            print(f"\t\tNetwork uptime: {len(cleaned)/len(gaps_filled)}")
 
             # concat all the outlier dataframes together for report of modified data
             outliers = pd.concat(
@@ -144,12 +150,12 @@ def main(data=None, report=None, plots=None):
         #     print("Process completed ---------------------------------------------------------\n")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         main(
-            Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/data"), 
-            Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/reports"),
-            Path("/Users/rzieber/Documents/3D-PAWS/AQI_Comparison/plots")
+            Path("/Users/rzieber/Documents/3D-PAWS/Storm_Surge_Comparison/data"), 
+            Path("/Users/rzieber/Documents/3D-PAWS/Storm_Surge_Comparison/report"),
+            timedelta(minutes=15)
         )
     else:
-        if len(sys.argv) == 3: main(Path(sys.argv[1]), Path(sys.argv[2]))
-        if len(sys.argv) == 4: main(Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3]))
+        if len(sys.argv) == 4: main(Path(sys.argv[1]), Path(sys.argv[2]), timedelta(minutes=int(sys.argv[3])))
+        if len(sys.argv) == 5: main(Path(sys.argv[1]), Path(sys.argv[2]), timedelta(minutes=int(sys.argv[3])), Path(sys.argv[4]))
