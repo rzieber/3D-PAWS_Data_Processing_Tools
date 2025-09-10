@@ -5,7 +5,6 @@ There exists the option to create some basic plots using the cleaned dataset. By
 will enable this functionality.<br>
 <br>
 Running `main.py` will produce the following results:
-
 - Raw data is cleaned:
   - Duplicate timestamps eliminated
   - Out-of-order timestamps sorted (ascending)
