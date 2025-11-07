@@ -117,7 +117,7 @@ def parse_args() -> tuple[str, str]:
     parser = argparse.ArgumentParser(description="Given a folder path, fills in data gaps in csv's downloaded from a CHORDS portal.")
     
     parser.add_argument("data_directory",   type=str,   help="Directory path where CHORDS csv's are located.")
-    parser.add_argument("sampling_rate",       type=int,   help="The instrument sampling rate (typically 1-minute).")
+    parser.add_argument("sampling_rate",    type=int,   help="The instrument sampling rate (typically 1-minute).")
     parser.add_argument("data_destination", type=str,   help="Where the reformatted data should be stored.")
     
     args = parser.parse_args()
