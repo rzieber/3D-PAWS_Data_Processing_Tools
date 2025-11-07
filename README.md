@@ -10,7 +10,7 @@ It works with an SSH tunnel, and consequently is only accessible to those whose 
 
 ### Usage
 ```bash 
-python3 active-stations.py <path/to/download/data> <chords portal name>
+python3 active-stations.py <path/to/export/results> <chords portal name>
 ```
 Also configured for library import.
 
