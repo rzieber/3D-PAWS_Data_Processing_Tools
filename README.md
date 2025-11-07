@@ -10,7 +10,7 @@ It works with an SSH tunnel, and consequently is only accessible to those whose 
 
 ### Usage
 ```bash 
-python3 active-stations.py <path/to/download/files> <chords portal name>
+python3 active-stations.py <path/to/download/data> <chords portal name>
 ```
 Also configured for library import.
 
@@ -19,6 +19,6 @@ The `data_gap_filler.py` script fills in time series data gaps for a directory o
 
 ### Usage
 ```bash 
-python3 data_gap_filler.py <data_directory> <sampling_rate> <data_destination>
+python3 data_gap_filler.py <path/to/downloaded/data> <sampling_rate> <path/to/data/output>
 ```
 Also configured for library import.
