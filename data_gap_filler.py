@@ -4,6 +4,7 @@ import numpy as np
 from datetime import timedelta
 from pathlib import Path
 import os
+import argparse
 
 """
 Helper function to fill_empty_rows()
@@ -40,7 +41,7 @@ reformatted_df -- the df to reformat with data gaps filled
 time_delta -- the dataset's resolution (1-minute reporting period)
 set_index -- specify whether you want the dataframe returned by fc'n to have the index set (default False)
 """
-def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=False):
+def _fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=False):
     if not isinstance(reformatted_df, pd.DataFrame):
         raise ValueError(f"The fill_empty_row() function expects the 'reformatted_df' parameter to be of type <pd.DataFrame>, received: {type(reformatted_df)}")
     if not isinstance(time_delta, int):
@@ -49,9 +50,11 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=
         raise ValueError(f"The fill_empty_row() function expects the 'set_index' parameter to be of type <bool>, received: {type(set_index)}")
 
     nan_columns = reformatted_df.columns[reformatted_df.isna().all()]
-    if not nan_columns.empty: print("[WARNING]: fill_empty_rows() -- Columns with all NaN values:", nan_columns.tolist())
+    if not nan_columns.empty: 
+        print("[WARNING]: fill_empty_rows() -- Empty columns:", nan_columns.tolist())
 
     if 'time' not in reformatted_df.columns: reformatted_df.reset_index(inplace=True)
+    reformatted_df['time'] = pd.to_datetime(reformatted_df['time'])
 
     blank_rows = [] # a list of lists 
     td = timedelta(minutes=time_delta)
@@ -86,26 +89,41 @@ def fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=
 
 
 
-
-def main():
-    data_directory = Path("/path/to/data/folder/")
+def main(data_directory:str, time_delta:int, data_destination:str):
+    try:
+        data_directory = Path(data_directory)
+        data_destination = Path(data_destination)
+    except Exception as e:
+        print(f"[ERROR]: Could not convert the given folder path into a valid Path object: {e}")
     
     files = []
-
     for file in os.listdir(data_directory):
-        if os.path.isfile(os.path.join(data_directory, file)): files.append(file)
+        if os.path.isfile(data_directory / file): 
+            files.append(file)
+        
 
     for file in files:
-        df = pd.read_csv(file)
+        df = pd.read_csv(data_directory / file)
 
-        gaps_filled_df = fill_empty_rows(df, timedelta(minutes=15))
+        gaps_filled_df = _fill_empty_rows(df, time_delta)
 
-        file_name = file.with_name(str(file.name)[:len(str(file.name))-4]+"_GAPS_FILLED.csv")
-        file.rename(file_name)
+        filename = file[:len(str(file))-4] + '_GAPS-FILLED.csv'
 
-        gaps_filled_df.to_csv(file)
-
+        gaps_filled_df.to_csv(data_destination / filename, index=False)
 
 
-if __name__ == '__main__':
-    main()
+
+def parse_args() -> tuple[str, str]:
+    parser = argparse.ArgumentParser(description="Given a folder path, fills in data gaps in csv's downloaded from a CHORDS portal.")
+    
+    parser.add_argument("data_directory",   type=str,   help="Directory path where CHORDS csv's are located.")
+    parser.add_argument("time_delta",       type=int,   help="The instrument sampling rate (typically 1-minute).")
+    parser.add_argument("data_destination", type=str,   help="Where the reformatted data should be stored.")
+    
+    args = parser.parse_args()
+
+    return (args.data_path, args.portal)
+
+
+if __name__ == "__main__":
+    main(*parse_args())
