@@ -1,6 +1,3 @@
-"""
-This script determines which stations are active or inactive for each 3D-PAWS database.
-"""
 import os
 from influxdb import InfluxDBClient
 import argparse

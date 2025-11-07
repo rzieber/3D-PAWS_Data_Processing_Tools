@@ -5,16 +5,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import timedelta
 from pathlib import Path
+import argparse
 
 project_root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(project_root))
 
 from data_exploration._fill_time_gaps import fill_empty_rows
 
-def main(data=None, report=None, time_delta=timedelta(minutes=1), plots=None,):
+def main(data:str=None, report:str=None, sampling_rate:int=1, plots:str=None):
+    try:
+        data = Path(data) if data is not None else None
+        report = Path(report) if report is not None else None
+        sampling_rate = timedelta(minutes=sampling_rate)
+        plots = Path(plots) if plots is not None else None
+    except Exception as e:
+        print(f"[ERROR]: could not parse argument -- {e}")
+
     with warnings.catch_warnings():
-        # warnings.simplefilter("ignore", category=pd.errors.SettingWithCopyWarning)
-        # warnings.simplefilter("ignore", category=UserWarning)
+        warnings.simplefilter("ignore", category=pd.errors.SettingWithCopyWarning)
+        warnings.simplefilter("ignore", category=UserWarning)
 
         csv_files = list(data.glob("*.csv")) 
 
@@ -24,7 +33,7 @@ def main(data=None, report=None, time_delta=timedelta(minutes=1), plots=None,):
 
             print("Starting 3D-PAWS data formatting ------------------------------------------")
 
-            file_name = csv.name[:len(csv.name)-4]
+            file_name = csv.stem
             print(f"\tProcessing dataframe for {file_name}.")
 
             # # TEMP FOR BARBADOS DATA
@@ -52,7 +61,7 @@ def main(data=None, report=None, time_delta=timedelta(minutes=1), plots=None,):
             print("\t\tNumber of out-of-order timestamps:", len(out_of_order))
 
             # fill in time gaps
-            gaps_filled = fill_empty_rows(cleaned, time_delta)    
+            gaps_filled = fill_empty_rows(cleaned, sampling_rate)    
             print("\t\tData gaps (in minutes):", len(gaps_filled) - len(cleaned))
             print(f"\t\tNetwork uptime: {len(cleaned)/len(gaps_filled)}")
 
@@ -97,14 +106,19 @@ def main(data=None, report=None, time_delta=timedelta(minutes=1), plots=None,):
 
         #     print("Process completed ---------------------------------------------------------\n")
 
+
+def parse_args() -> tuple[str, str, timedelta, str]:
+    parser = argparse.ArgumentParser(description="Performs basic data exploration for a set of CHORDS csv's.")
+
+    parser.add_argument("data", type=Path, help="The directory which houses the CHORDS csv's.")
+    parser.add_argument("report", type=Path, help="The directory to which a statistical report should be created for each CHORDS csv.")
+    parser.add_argument("sampling_rate", type=int, help="The rate at which data is sampled for a 3D-PAWS instrument. Default: 1-minute")
+    parser.add_argument("plots", type=str, help="The directory to which exploratory plots should be created for each CHORDS csv.")
+
+    args = parser.parse_args()
+
+    return (args.data, args.report, args.sampling_rate, args.plots)
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        main(
-            Path("/Users/rzieber/Documents/3D-PAWS/Storm_Surge_Comparison/data"), 
-            Path("/Users/rzieber/Documents/3D-PAWS/Storm_Surge_Comparison/report"),
-            timedelta(minutes=6)
-            #Path("/Users/rzieber/Documents/3D-PAWS/Storm_Surge_Comparison/plots")
-        )
-    else:
-        if len(sys.argv) == 4: main(Path(sys.argv[1]), Path(sys.argv[2]), timedelta(minutes=int(sys.argv[3])))
-        if len(sys.argv) == 5: main(Path(sys.argv[1]), Path(sys.argv[2]), timedelta(minutes=int(sys.argv[3])), Path(sys.argv[4]))
+    main(*parse_args())
