@@ -38,14 +38,14 @@ Merges that list with the reformatted dataframe, sorts by time, and returns it.
 REQUIREMENT: the timestamp column must be named 'time' ---------------------------------------------------
 
 reformatted_df -- the df to reformat with data gaps filled
-time_delta -- the dataset's resolution (1-minute reporting period)
+sampling_rate -- the dataset's resolution (1-minute reporting period)
 set_index -- specify whether you want the dataframe returned by fc'n to have the index set (default False)
 """
-def _fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool=False):
+def _fill_empty_rows(reformatted_df:pd.DataFrame, sampling_rate:int, set_index:bool=False):
     if not isinstance(reformatted_df, pd.DataFrame):
         raise ValueError(f"The fill_empty_row() function expects the 'reformatted_df' parameter to be of type <pd.DataFrame>, received: {type(reformatted_df)}")
-    if not isinstance(time_delta, int):
-        raise ValueError(f"The fill_empty_row() function expects the 'time_delta' parameter to be of type <int>, received: {type(time_delta)}")
+    if not isinstance(sampling_rate, int):
+        raise ValueError(f"The fill_empty_row() function expects the 'sampling_rate' parameter to be of type <int>, received: {type(sampling_rate)}")
     if not isinstance(set_index, bool):
         raise ValueError(f"The fill_empty_row() function expects the 'set_index' parameter to be of type <bool>, received: {type(set_index)}")
 
@@ -57,7 +57,7 @@ def _fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool
     reformatted_df['time'] = pd.to_datetime(reformatted_df['time'])
 
     blank_rows = [] # a list of lists 
-    td = timedelta(minutes=time_delta)
+    td = timedelta(minutes=sampling_rate)
 
     to_filter = reformatted_df[reformatted_df['time'].isna()]
     reformatted_df = reformatted_df[~reformatted_df['time'].isna()]
@@ -89,7 +89,7 @@ def _fill_empty_rows(reformatted_df:pd.DataFrame, time_delta:int, set_index:bool
 
 
 
-def main(data_directory:str, time_delta:int, data_destination:str):
+def main(data_directory:str, sampling_rate:int, data_destination:str):
     try:
         data_directory = Path(data_directory)
         data_destination = Path(data_destination)
@@ -105,7 +105,7 @@ def main(data_directory:str, time_delta:int, data_destination:str):
     for file in files:
         df = pd.read_csv(data_directory / file)
 
-        gaps_filled_df = _fill_empty_rows(df, time_delta)
+        gaps_filled_df = _fill_empty_rows(df, sampling_rate)
 
         filename = file[:len(str(file))-4] + '_GAPS-FILLED.csv'
 
@@ -117,7 +117,7 @@ def parse_args() -> tuple[str, str]:
     parser = argparse.ArgumentParser(description="Given a folder path, fills in data gaps in csv's downloaded from a CHORDS portal.")
     
     parser.add_argument("data_directory",   type=str,   help="Directory path where CHORDS csv's are located.")
-    parser.add_argument("time_delta",       type=int,   help="The instrument sampling rate (typically 1-minute).")
+    parser.add_argument("sampling_rate",    type=int,   help="The instrument sampling rate (typically 1-minute).")
     parser.add_argument("data_destination", type=str,   help="Where the reformatted data should be stored.")
     
     args = parser.parse_args()
