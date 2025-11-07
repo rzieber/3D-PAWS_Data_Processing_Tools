@@ -17,9 +17,9 @@ Running `main.py` will produce the following results:
 - Timestamp column must be named `time`
 - Data is reported every minute unless otherwise specified
 - Source and destination folders follow this convention:
-  - ```data``` folder contains raw data to be qc'd
-  - ```report``` folder will contain the output from the qc script
-  - ```plots``` folder will contain the plots (if using) 
+  - `data` folder contains raw data to be qc'd
+  - `report` folder will contain the output from the qc script
+  - `plots` folder will contain the plots (if using) 
 
 # Dependancies 
 ```bash
@@ -28,9 +28,10 @@ pip install -r requirements.txt
 
 # Usage
 ```bash
-python3 main.py path/to/raw/data/folder path/to/output/folder timedelta
+python3 main.py <path/to/raw/data/folder> <path/to/output/folder> <sampling_rate>
 ```
 Optionally:
 ```bash
-python3 main.py path/to/raw/data/folder path/to/output/folder path/to/plots/folder timedelta
+python3 main.py <path/to/raw/data/folder> <path/to/output/folder> <timedelta> <path/to/plots/folder>
 ```
+It is also configured for library import.
