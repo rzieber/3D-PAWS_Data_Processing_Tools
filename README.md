@@ -9,12 +9,16 @@ It works with an SSH tunnel, and consequently is only accessible to those whose 
 2. Run the `active-stations.py` script locally using the INFLUX_USERNAME and INFLUX_PASSWORD credentials for that server (see CHORDS_ADMIN_PW).
 
 ### Usage
-```bash python3 active-stations.py <path/to/download/files> <chords portal name>```<br>
+```bash 
+python3 active-stations.py <path/to/download/files> <chords portal name>
+```
 Also configured for library import.
 
 ## Data Gap Filler
 The `data_gap_filler.py` script fills in time series data gaps for a directory of csv's downloaded from a CHORDS portal.
 
 ### Usage
-```bash python3 data_gap_filler.py <data_directory> <sampling_rate> <data_destination>```<br>
+```bash 
+python3 data_gap_filler.py <data_directory> <sampling_rate> <data_destination>
+```
 Also configured for library import.
