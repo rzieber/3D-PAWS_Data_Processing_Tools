@@ -5,6 +5,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 import argparse
+import sys
 
 """
 Helper function to fill_empty_rows()
@@ -53,7 +54,9 @@ def _fill_empty_rows(reformatted_df:pd.DataFrame, sampling_rate:int, set_index:b
     if not nan_columns.empty: 
         print("[WARNING]: fill_empty_rows() -- Empty columns:", nan_columns.tolist())
 
-    if 'time' not in reformatted_df.columns: reformatted_df.reset_index(inplace=True)
+    if 'time' not in reformatted_df.columns: 
+        reformatted_df.reset_index(inplace=True)
+
     reformatted_df['time'] = pd.to_datetime(reformatted_df['time'])
 
     blank_rows = [] # a list of lists 
@@ -96,19 +99,20 @@ def main(data_directory:str, sampling_rate:int, data_destination:str):
     except Exception as e:
         print(f"[ERROR]: Could not convert the given folder path into a valid Path object: {e}")
     
-    files = []
-    for file in os.listdir(data_directory):
-        if os.path.isfile(data_directory / file): 
-            files.append(file)
-        
+    files = [f for f in os.listdir(data_directory) if f.endswith('.csv')]
 
     for file in files:
-        df = pd.read_csv(data_directory / file)
+        df = pd.read_csv(data_directory / file, encoding='latin1')
+        
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed|^level_', case=False, na=False)]  # Drop garbage index columns
+
+        if 'time' not in df.columns:                                      
+            print(f"[ERROR]: No 'time' column in {file}")
+            sys.exit(1)
 
         gaps_filled_df = _fill_empty_rows(df, sampling_rate)
 
-        filename = file[:len(str(file))-4] + '_GAPS-FILLED.csv'
-
+        filename = file[:len(file)-4]+ '_GAPS-FILLED.csv'
         gaps_filled_df.to_csv(data_destination / filename, index=False)
 
 
