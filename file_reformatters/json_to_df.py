@@ -2,14 +2,15 @@ import json
 import logging
 import pandas as pd
 from pathlib import Path
+import argparse
 
 """
 ARGUMENTS
-    headers - column names to be used in CSV                                        <list>
-    measurements - data points at each timestamp                                    <list>
-    column_order - [OPTIONAL] specify an order for columns in df/csv                <list>
-    filepath - [OPTIONAL] export path for csv of df, default is the empty string    <str>
-    null_value - [OPTIONAL] char to fill empty cells, default is the empty string   <str>
+    headers - column names to be used in CSV                                            <list>
+    measurements - data points at each timestamp                                        <list>
+    column_order - [OPTIONAL] specify an order for columns in df/csv, default is None   <list>
+    filepath - [OPTIONAL] export path for csv of df, default is None                    <Path>
+    null_value - [OPTIONAL] char to fill empty cells, default is None                   <str>
 RAISES
     TypeError - if parameters do not match the type specified by the argument
     ValueError - if the 'measurements' argument contains no data
@@ -21,16 +22,15 @@ Options:
     - Specify what to populate empty cells in the dataframe/csv with.
 Returns the dataframe. Optional feature to generate a CSV of the df at the specified filepath.
 """
-def df_builder(headers:list, measurements:list, column_order:list=[], filepath:str='', fill_empty='') -> pd.DataFrame: 
-    # Input validation
+def _df_builder(headers:list, measurements:list, column_order:list=None, filepath:Path=None, fill_empty=None) -> pd.DataFrame: 
     if not isinstance(headers, list):
         raise TypeError(f"[ERROR]: The 'headers' parameter in csv_builder() should be of type <list>, passed: {type(headers)}")
     if not isinstance(measurements, list):
         raise TypeError(f"[ERROR]: The 'measurements' parameter in csv_builder() should be of type <list>, passed: {type(measurements)}")
-    if not isinstance(column_order, list):
+    if column_order is not None and not isinstance(column_order, list):
         raise TypeError(f"[ERROR]: The 'column_order' parameter in csv_builder() should be of type <list>, passed: {type(column_order)}")
-    if not isinstance(filepath, str):
-        raise TypeError(f"[ERROR]: The 'filepath' parameter in csv_builder() should be of type <str>, passed: {type(filepath)}")
+    if filepath is not None and not isinstance(filepath, Path):
+        raise TypeError(f"[ERROR]: The 'filepath' parameter in csv_builder() should be of type <Path>, passed: {type(filepath)}")
     if not measurements:
         raise ValueError("[ERROR]: No valid measurements found in JSON file.")
     
@@ -67,12 +67,12 @@ def df_builder(headers:list, measurements:list, column_order:list=[], filepath:s
     return df
 
 
-def main():
+def main(json_file:str, filepath:str=None, column_order:list=None, fill_empty=None) -> pd.DataFrame:
     logging.basicConfig(level=logging.INFO)
 
-    json_file = Path("/path/to/json.file")
+    json_file = Path(json_file)
+    filepath = Path(filepath) if filepath is not None else None
 
-    # Read JSON data from file and process it
     with open(json_file, 'r', encoding='utf-8', errors='replace') as file:
         measurements = [] 
 
@@ -87,7 +87,36 @@ def main():
         
         headers = list({key for d in measurements for key in d.keys()})
 
-        # Create a dataframe from JSON data
-        df = df_builder(headers, measurements)
+        return _df_builder(
+            headers=headers, 
+            measurements=measurements,
+            column_order=column_order, 
+            filepath=filepath,
+            fill_empty=fill_empty
+        )
 
-if __name__ == "__main__": main()
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="[TODO]")
+
+    parser.add_argument("json_file", type=str, help="File path to the JSON file which is to be converted into a dataframe.")
+    parser.add_argument("--filepath", type=str, default=None, help="Optional file path where a csv of the dataframe may be downloaded.")
+    parser.add_argument("--column_order", type=str, default=None, help="Optional order to assign columns in the dataframe.")
+    parser.add_argument("--fill_empty", default=None, help="Optional value to fill in empty cells in the dataframe.")
+
+    args = parser.parse_args()
+
+    if args.column_order is not None:
+        args.column_order = args.column_order.split(',')
+
+    if args.fill_empty is not None:
+        try:
+            args.fill_empty = eval(args.fill_empty)
+        except:
+            pass  # fallback to string if eval fails
+
+    return args.json_file, args.filepath, args.column_order, args.fill_empty
+
+
+if __name__ == "__main__": 
+    main(*parse_args())
